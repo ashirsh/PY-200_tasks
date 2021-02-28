@@ -17,21 +17,36 @@ from lesson_5.a_linkedlist import LinkedList
 from lesson_5.a_driver import IStructureDriver, JsonFileDriver
 
 
-class LinkedListWithDriver(...):
+class LinkedListWithDriver(LinkedList):
     def __init__(self, data, driver: IStructureDriver = None):
-        # ToDo вызвать конструктор базового класса LinkedList
-        ...
+        super().__init__(data)
+        self.driver = driver
+
+    @property
+    def driver(self):
+        return self.__driver
+
+    @driver.setter
+    def driver(self, driver):
+        if not isinstance(driver, IStructureDriver):
+            raise TypeError('Используемый объект не является драйвером')
         self.__driver = driver
 
     def read(self):
         """Взять драйвер и считать из него информацию в LinkedList"""
-        ...
+        self.clear()
+        for item in self.__driver.read():
+            self.append(item)
+        return self
 
     def write(self):
         """Взять драйвер и записать в него информацию из LinkedList"""
-        ...
+        self.__driver.write([i for i in self.__iter__()])
 
 
 if __name__ == '__main__':
-    ll = LinkedListWithDriver([1, 2, 3, 4, 5])
+    json_driver = JsonFileDriver('test.json')
+    ll = LinkedListWithDriver([1, 2, 3, 4, 5], json_driver)
     ll.write()
+    ll1 = LinkedListWithDriver(data=[], driver=json_driver).read()
+    print(ll1)
