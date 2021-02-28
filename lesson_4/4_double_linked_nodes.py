@@ -1,12 +1,12 @@
 """
 Сделать DoubleLinkedNode наследуясь от класса Node
 
-    1. В конструкторе DoubleLinkedNode обязательно вызвать конструктор базоваго класса и определить дополнительный
-        атрибут self.prev, хранящий в себе ссылку на предыдущий узел. Тем сымым дополняя функциональность базового класса,
+    1. В конструкторе DoubleLinkedNode обязательно вызвать конструктор базового класса и определить дополнительный
+        атрибут self.prev, хранящий в себе ссылку на предыдущий узел. Тем самым дополняя функциональность базового класса,
         сохраняя его логику.
     2. Атрибут экземпляра prev сделать свойством prev. Определить для него getter и setter c проверками аналогичными
         свойству next в класса Node.
-    3. В классе Node вынести проверку присваемого узла в setter свойства next во внутренний метод.
+    3. В классе Node вынести проверку присваиваемого узла в setter свойства next во внутренний метод.
         Данный метод должен быть внутренним и не доступным пользователю.
     4. В классе DoubleLinkedNode воспользоваться методом из прошлого шага, чтобы проверить setter свойства prev.
         Каким должен быть этот метод?
@@ -24,7 +24,7 @@ class Node:
     Пользователь напрямую не работает с узлами списка, узлами оперирует список.
     """
 
-    def __init__(self, value: Any, next_: Optional['Node'] = None):
+    def __init__(self, value: Any, next_: Optional['Node'] = None, prev: Optional['Node'] = None):
         """
         Создаем новый узел для односвязного списка
 
@@ -42,11 +42,14 @@ class Node:
     @next.setter
     def next(self, next_: Optional['Node']):
         """Setter проверяет и устанавливает следующий узел связного списка"""
-        if not isinstance(next_, self.__class__) and next_ is not None:
-            msg = f"Устанавливаемое значение должно быть экземпляром класса {self.__class__.__name__} " \
-                  f"или None, не {next_.__class__.__name__}"
-            raise TypeError(msg)
+        self._is_node(next_)
         self.__next = next_
+
+    def _is_node(self, property_):
+        if not isinstance(property_, self.__class__) and property_ is not None:
+            msg = f"Устанавливаемое значение должно быть экземпляром класса {self.__class__.__name__} " \
+                  f"или None, не {property_.__class__.__name__}"
+            raise TypeError(msg)
 
     def __repr__(self):
         """Метод должен возвращать строку, показывающую, как может быть создан экземпляр."""
@@ -59,15 +62,25 @@ class Node:
 
 class DoubleLinkedNode(Node):
     def __init__(self, value: Any,
-                 next_: Optional['Node'] = None,
-                 prev: Optional['Node'] = None):
-        # ToDo расширить возможности базового конструтора с учетом особенностей двусвязного списка
-        ...
+                 next_: Optional['DoubleLinkedNode'] = None,
+                 prev: Optional['DoubleLinkedNode'] = None):
+        super().__init__(value, next_)
+        self.prev = prev
+
+    @property
+    def prev(self):
+        """Getter возвращает следующий узел связного списка"""
+        return self.__prev
+
+    @prev.setter
+    def prev(self, prev: Optional['DoubleLinkedNode']):
+        """Setter проверяет и устанавливает следующий узел связного списка"""
+        self._is_node(prev)
+        self.__prev = prev
 
     def __repr__(self) -> str:
         """Метод должен возвращать строку, показывающую, как может быть создан экземпляр."""
-        # ToDo перегрузить метод
-        ...
+        return f'{self.__class__.__name__}({self.value}, next={self.next}, prev={self.prev})'
 
 
 if __name__ == '__main__':
@@ -81,5 +94,5 @@ if __name__ == '__main__':
     first_node.next = second_node
     second_node.prev = first_node
 
-    print(first_node.next)
-    print(second_node.prev)
+    print(repr(first_node.next))
+    print(repr(second_node.prev))
