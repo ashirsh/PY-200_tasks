@@ -2,7 +2,7 @@
     Выбрать экземпляры класса LinkedList будут итераторами или итерируемыми объектами.
     и уметь обосновать(!) это (https://colab.research.google.com/drive/12UErjm9lm31DPEFSxcyrH47LUX5oRwyH#scrollTo=z_-otPpGrQTs)
 
-    В соответвии с понятным и знакомым выбранным решением реализовать соответвующие методы.
+    В соответствии с понятным и знакомым выбранным решением реализовать соответствующие методы.
     Можно пользоваться любыми готовыми итераторами, функциями-генераторами, самостоятельно реализовывать метод __next__.
 """
 
@@ -55,7 +55,8 @@ class LinkedList:
     def __init__(self, data: Sequence = None):
         """Конструктор связного списка"""
         self.__len = 0
-        self.head = None  # Node
+        self.head = None
+        self.tail = None
 
         if data:
             for value in data:
@@ -88,7 +89,6 @@ class LinkedList:
         return current_node
 
     def __getitem__(self, item: int) -> Any:
-        print('Вызван метод __getitem__')
         current_node = self.__step_by_step_on_nodes(item)
         return current_node.value
 
@@ -97,23 +97,24 @@ class LinkedList:
         append_node = self.Node(value)
         if self.head is None:
             self.head = append_node
+            self.tail = append_node
         else:
-            tail = self.head  # ToDo Завести атрибут self.tail, который будет хранить последний узел
-            for _ in range(self.__len - 1):
-                tail = tail.next
+            tail = self.tail
             self.__linked_nodes(tail, append_node)
+            self.tail = tail.next
         self.__len += 1
 
     @staticmethod
     def __linked_nodes(left: Node, right: Optional[Node]) -> None:
         left.next = right
 
-    def __iter__(self):  # ToDo перегрузить метод для работы с циклом for
-        print('Вызван метод __iter__')
-        ...
+    def __iter__(self):
+        self.generator = (self.__getitem__(current_index) for current_index in range(self.__len))
+        return self.generator
 
 
 if __name__ == '__main__':
     ll = LinkedList([1, 2, 3, 4, 5])
-    for value in ll:
-        print(value)
+    for i in ll:
+        print(i)
+    print(ll)

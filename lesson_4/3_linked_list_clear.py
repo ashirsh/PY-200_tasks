@@ -1,11 +1,11 @@
 """
-    Взять класс LinkedList и определить для него соответвующие методы очистки списка от объектов Node.
+    Взять класс LinkedList и определить для него соответствующие методы очистки списка от объектов Node.
 
     1. Перегрузить в классе Node метод __del__, чтобы видеть сообщение о том, что текущий объект удален
     2. Используя встроенную функцию sys.getrefcount() от каждого узла списка получить информацию о количестве
-        переменных, которые ссылаются на данный объект. Прокоментировать и рассказать откуда берется каждая ссылка.
+        переменных, которые ссылаются на данный объект. Прокомментировать и рассказать откуда берется каждая ссылка.
         см. Алгоритм подсчета ссылок https://colab.research.google.com/drive/12UErjm9lm31DPEFSxcyrH47LUX5oRwyH#scrollTo=jxYLDA_KDPv6
-    3. Реализовать метод **`clear`**. Метод очиски связанного списка должен быть оформлен в одну строку с
+    3. Реализовать метод **`clear`**. Метод очистки связанного списка должен быть оформлен в одну строку с
         удалением всех узлов списка.
 """
 
@@ -53,13 +53,14 @@ class LinkedList:
             """Вызывается функциями str, print и format. Возвращает строковое представление объекта."""
             return f"{self.value}"
 
-        def __del__(self):  # ToDo Вывод сообщения о том, что узел был удален
-            ...
+        def __del__(self):
+            print(f"Удален узел {self}")
 
     def __init__(self, data: Sequence = None):
         """Конструктор связного списка"""
         self.__len = 0
-        self.head = None  # Node
+        self.head = None
+        self.tail = None
 
         if data:
             for value in data:
@@ -92,35 +93,46 @@ class LinkedList:
         return current_node
 
     def __getitem__(self, item: int) -> Any:
-        print('Вызван метод __getitem__')
         current_node = self.__step_by_step_on_nodes(item)
         return current_node.value
+
+    def __iter__(self):
+        self.generator = (self.__getitem__(current_index) for current_index in range(self.__len))
+        return self.generator
 
     def append(self, value: Any):
         """Добавление элемента в конец связного списка"""
         append_node = self.Node(value)
         if self.head is None:
             self.head = append_node
+            self.tail = append_node
         else:
-            tail = self.head  # ToDo Завести атрибут self.tail, который будет хранить последний узел
-            for _ in range(self.__len - 1):
-                tail = tail.next
+            tail = self.tail
             self.__linked_nodes(tail, append_node)
+            self.tail = tail.next
         self.__len += 1
 
     @staticmethod
     def __linked_nodes(left: Node, right: Optional[Node]) -> None:
         left.next = right
 
-    def clear(self):  # ToDo перегрузить метод для удаления всех узлов
-        ...
+    def clear(self) -> None:
+        self.head = None
+        self.tail = None
+        self.__len = 0
 
 
 if __name__ == '__main__':
     ll = LinkedList([1, 2, 3, 4, 5])
+    print(ll)
     print(sys.getrefcount(ll))
+    a = ll[1]
+    b = a
+    c = ll[1]
+    d = ll[2]
 
-    # ToDo Вывести количество ссылок на каждый узел списка
-    ...
+    for i in ll:
+        print(f'Количество ссылок на узел {i}: {sys.getrefcount(i)}')
 
     ll.clear()
+    print(ll)
